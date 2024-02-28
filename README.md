@@ -1,1 +1,1 @@
-# automatic-folder
+# Automatic folder
