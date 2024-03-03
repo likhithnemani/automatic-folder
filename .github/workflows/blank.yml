@@ -18,12 +18,12 @@ jobs:
       - name: Install dependencies
         run: pip install pandas requests
 
-      - name: Install npm dependencies
-        run: npm install @actions/github
-
       - name: Run Python script
-        run: python validate.py
+        run: python path/to/your_script.py
         id: python-script
+
+      - name: Install GitHub Script Dependencies
+        run: npm install @actions/github
 
       - name: Create Issue
         if: always()
@@ -40,13 +40,17 @@ jobs:
             `;
             
             const octokit = new GitHub(process.env.GITHUB_TOKEN);
-            await octokit.issues.create({
+            octokit.issues.create({
               owner: 'likhithnemani', // Replace 'YourRepoOwner' with your repository owner
               repo: 'automatic-folder',   // Replace 'YourRepoName' with your repository name
               title: title,
               body: body
+            }).then(response => {
+              console.log('Issue created:', response.data.html_url);
+            }).catch(error => {
+              console.error('Error creating issue:', error);
             });
-            
+
   continue_or_cancel:
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request != null && github.event.issue.comments != null
