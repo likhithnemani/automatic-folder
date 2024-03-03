@@ -1,54 +1,41 @@
-name: API Call with User Interaction
+name: Workflow with Interactive Steps
 
 on:
-  # Replace with your desired trigger event (e.g., push, schedule)
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  with-interaction:
+  run_python_script:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Install dependencies (if needed)
-        # Replace with any required installation commands
-        run: npm install axios
+      - name: Run Python script
+        run: python validate.py
+        id: python-script
 
-      - name: Make API call
-        uses: mashape/github-action-http-request@v1.4.1
-        with:
-          url: https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2  # Replace with your API endpoint
-          method: POST  # Replace with appropriate method (GET, POST, etc.)
-          headers: "Authorization: Bearer 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" # Adjust headers if needed
-          json: "{'input': 'sample'}"
-          # Add authentication details if required
-
-      - name: Parse API response
+      - name: Send message with buttons
+        if: always()
         run: |
-          response_data=$(echo ${{ steps.make_api_call.outputs.body }})
-          # Extract relevant information from response_data
-          extracted_data=$(echo $response_data | jq -r '.message')  # Replace with your parsing logic
+          echo "::warning::Please click [Continue](#continue) to proceed or [Cancel](#cancel) to cancel."
+          echo "::error::User input required."
 
-      - name: Display response and buttons
-        run: |
-          echo "API Response: $extracted_data"
-          echo ""
-          echo "Please choose an option:"
-          echo "1. Continue workflow"
-          echo "2. Cancel workflow"
-          read -r user_choice
+  continue_or_cancel:
+    needs: run_python_script
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'action_required'
 
-      - name: Branch workflow based on user choice
-        uses: actions/checkout@v3  # Checkout code again (optional)
-        with:
-          persist-credentials: true
+    steps:
+      - name: Check user input
+        if: github.event.workflow_run.conclusion == 'success'
         run: |
-          if [[ $user_choice -eq 1 ]]; then
-            # Continue workflow steps
-            echo "Continuing workflow..."
-            # Add your steps to continue the workflow
+          if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+            echo "User clicked Continue."
+            # Continue with workflow steps
           else
-            echo "Workflow cancelled."
-            # Optionally perform any cleanup steps here
+            echo "User clicked Cancel."
+            # Stop the workflow or take appropriate action
           fi
