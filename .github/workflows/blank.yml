@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  issue_comment:
+    types: [created]
 
 jobs:
   run_python_script:
@@ -17,27 +19,29 @@ jobs:
         run: pip install pandas requests
 
       - name: Run Python script
-        run: python validate.py
+        run: python path/to/your_script.py
         id: python-script
 
-      - name: Send message with buttons
+      - name: Create Issue
         if: always()
-        run: |
-          echo "::warning::Please click [Continue](#continue) to proceed or [Cancel](#cancel) to cancel."
+        uses: peter-evans/create-issue-from-file@v2
+        with:
+          title: 'User input required'
+          body: |
+            Please click [Continue](../../issues/new?title=Continue%20Workflow&body=Please%20continue%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"continue"%20below.) to proceed or [Cancel](../../issues/new?title=Cancel%20Workflow&body=Please%20cancel%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"cancel"%20below.) to cancel.
 
   continue_or_cancel:
-    needs: run_python_script
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'action_required'
-
+    if: github.event.issue.pull_request != null && github.event.issue.comments != null
     steps:
-      - name: Check user input
-        if: github.event.workflow_run.conclusion == 'success'
+      - name: Check for 'Continue' or 'Cancel' comment
         run: |
-          if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+          if grep -qE '(^|\W)continue(\W|$)' <<< "${{ github.event.comment.body }}"; then
             echo "User clicked Continue."
             # Continue with workflow steps
-          else
+          elif grep -qE '(^|\W)cancel(\W|$)' <<< "${{ github.event.comment.body }}"; then
             echo "User clicked Cancel."
             # Stop the workflow or take appropriate action
+          else
+            echo "Invalid comment. Please comment 'continue' or 'cancel'."
           fi
