@@ -29,7 +29,7 @@ jobs:
         if: always()
         uses: actions/github-script@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: "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"
           script: |
             const title = 'User input required';
             const body = `
