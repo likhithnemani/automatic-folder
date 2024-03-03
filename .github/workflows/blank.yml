@@ -19,7 +19,7 @@ jobs:
         run: pip install pandas requests
 
       - name: Run Python script
-        run: python path/to/your_script.py
+        run: python validate.py
         id: python-script
 
       - name: Install GitHub Script Dependencies
