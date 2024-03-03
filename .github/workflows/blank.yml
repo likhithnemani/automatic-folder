@@ -1,0 +1,63 @@
+name: Execute Python Script with README Content
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run_script:
+    name: Run Python Script
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas
+
+      - name: Fetch README Content
+        id: fetch_readme
+        run: |
+          readme_content=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                          -H "Accept: application/vnd.github.v3.raw" \
+                          https://raw.githubusercontent.com/${{ github.repository }}/main/README.md)
+          echo "::set-output name=readme_content::$readme_content"
+
+      - name: Execute Python Script
+        id: execute_script
+        run: |
+          import requests
+          import pandas as pd
+
+          readme_content = """${{ steps.fetch_readme.outputs.readme_content }}"""
+
+          API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
+          headers = {"Authorization": "Bearer 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"}
+
+          def query(payload):
+              response = requests.post(API_URL, headers=headers, json=payload)
+              return response.json()
+
+          # Make the query
+          output = query({
+              "inputs": "## Instruction Check if the input passage answers the above questions answered. If all of them are answered give the o/p as yes or else print the missing ones. 1) Tech stack is mentioned or not ? 2) Name of the project mentioned or not ? 3) Project description mentioned or not ? ## Input: " + readme_content + " Output (Yes/No):"
+          })
+
+          # Extract project description from the generated text
+          generated_text = output[0]['generated_text']
+          print(generated_text)
+          echo "::set-output name=generated_text::$generated_text"
+
+      - name: Print Generated Text
+        run: |
+          echo "Generated Text:"
+          echo "${{ steps.execute_script.outputs.generated_text }}"
