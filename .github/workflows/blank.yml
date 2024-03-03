@@ -24,7 +24,6 @@ jobs:
         if: always()
         run: |
           echo "::warning::Please click [Continue](#continue) to proceed or [Cancel](#cancel) to cancel."
-          echo "::error::User input required."
 
   continue_or_cancel:
     needs: run_python_script
