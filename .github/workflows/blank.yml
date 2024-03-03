@@ -29,7 +29,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const { context, GitHub } = require('@actions/github');
+            const { GitHub } = require('@actions/github');
             
             const title = 'User input required';
             const body = `
@@ -38,8 +38,8 @@ jobs:
             
             const octokit = new GitHub(process.env.GITHUB_TOKEN);
             await octokit.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner: 'likhithnemani', // Replace 'YourRepoOwner' with your repository owner
+              repo: 'automatic-folder',   // Replace 'YourRepoName' with your repository name
               title: title,
               body: body
             });
