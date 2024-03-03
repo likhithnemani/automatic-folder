@@ -1,71 +1,54 @@
-name: Execute Python Script with README Content
+name: API Call with User Interaction
 
 on:
+  # Replace with your desired trigger event (e.g., push, schedule)
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  run_script:
-    name: Run Python Script
+  with-interaction:
     runs-on: ubuntu-latest
-    env:
-      pythonLocation: /opt/hostedtoolcache/Python/3.12.2/x64
-      LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.2/x64/lib
-      MAGICK_HOME: /
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies (if needed)
+        # Replace with any required installation commands
+        run: npm install axios
+
+      - name: Make API call
+        uses: mashape/github-action-http-request@v1.4.1
         with:
-          python-version: '3.x'
+          url: https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2  # Replace with your API endpoint
+          method: POST  # Replace with appropriate method (GET, POST, etc.)
+          headers: "Authorization: Bearer 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" # Adjust headers if needed
+          json: "{'input': 'sample'}"
+          # Add authentication details if required
 
-      - name: Install Dependencies
+      - name: Parse API response
         run: |
-          python -m pip install --upgrade pip
-          pip install requests pandas
+          response_data=$(echo ${{ steps.make_api_call.outputs.body }})
+          # Extract relevant information from response_data
+          extracted_data=$(echo $response_data | jq -r '.message')  # Replace with your parsing logic
 
-      - name: Fetch README Content
-        id: fetch_readme
+      - name: Display response and buttons
         run: |
-          readme_content=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                          -H "Accept: application/vnd.github.v3.raw" \
-                          https://raw.githubusercontent.com/${{ github.repository }}/main/README.md)
-          echo "::set-output name=readme_content::$readme_content"
+          echo "API Response: $extracted_data"
+          echo ""
+          echo "Please choose an option:"
+          echo "1. Continue workflow"
+          echo "2. Cancel workflow"
+          read -r user_choice
 
-      - name: Execute Python Script
-        id: execute_script
+      - name: Branch workflow based on user choice
+        uses: actions/checkout@v3  # Checkout code again (optional)
+        with:
+          persist-credentials: true
         run: |
-            import requests
-            import pandas as pd
-            
-            # Assuming your dataset is in a CSV file named "final_dataset.csv"
-            # We'll replace this with reading the README file in the repository later
-            # df = pd.read_csv("final_dataset.csv")
-            
-            API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2"
-            headers = {"Authorization": "Bearer "}  # Replace with your actual authorization token
-            
-            def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
-                return response.json()
-            
-            # Make the query
-            # For demonstration purposes, I'm just passing a sample string
-            sample_text = "This is a sample project description."
-            output = query({
-                "inputs": "## Instruction Check if the input passage answers the above questions answered. If all of them are answered give the o/p as yes or else print the missing ones. 1) Tech stack is mentioned or not ? 2) Name of the project mentioned or not ? 3) Project description mentioned or not ? ## Input: " + sample_text + " Output (Yes/No):"
-            })
-            
-            # Extract project description from the generated text
-            generated_text = output[0]['generated_text']
-            print(generated_text)
-
-
-      - name: Print Generated Text
-        run: |
-          echo "Generated Text:"
-          echo "${{ steps.execute_script.outputs.generated_text }}"
+          if [[ $user_choice -eq 1 ]]; then
+            # Continue workflow steps
+            echo "Continuing workflow..."
+            # Add your steps to continue the workflow
+          else
+            echo "Workflow cancelled."
+            # Optionally perform any cleanup steps here
+          fi
