@@ -27,29 +27,12 @@ jobs:
 
       - name: Create Issue
         if: always()
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const { GitHub } = require('@actions/github');
-            
-            const title = 'User input required';
-            const body = `
-              Please click [Continue](../../issues/new?title=Continue%20Workflow&body=Please%20continue%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"continue"%20below.) to proceed or [Cancel](../../issues/new?title=Cancel%20Workflow&body=Please%20cancel%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"cancel"%20below.) to cancel.
-            `;
-            
-            const octokit = new GitHub(process.env.GITHUB_TOKEN);
-            octokit.issues.create({
-              owner: 'likhithnemani', // Replace 'YourRepoOwner' with your repository owner
-              repo: 'automatic-folder',   // Replace 'YourRepoName' with your repository name
-              title: title,
-              body: body
-            }).then(response => {
-              console.log('Issue created:', response.data.html_url);
-            }).catch(error => {
-              console.error('Error creating issue:', error);
-            });
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"title":"User input required","body":"Please click [Continue](../../issues/new?title=Continue%20Workflow&body=Please%20continue%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20\"continue\"%20below.) to proceed or [Cancel](../../issues/new?title=Cancel%20Workflow&body=Please%20cancel%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20\"cancel\"%20below.) to cancel."}' \
+            https://api.github.com/repos/YourRepoOwner/YourRepoName/issues
 
   continue_or_cancel:
     runs-on: ubuntu-latest
