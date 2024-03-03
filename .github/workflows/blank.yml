@@ -24,12 +24,26 @@ jobs:
 
       - name: Create Issue
         if: always()
-        uses: peter-evans/create-issue-from-file@v2
+        uses: actions/github-script@v4
         with:
-          title: 'User input required'
-          body: |
-            Please click [Continue](../../issues/new?title=Continue%20Workflow&body=Please%20continue%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"continue"%20below.) to proceed or [Cancel](../../issues/new?title=Cancel%20Workflow&body=Please%20cancel%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"cancel"%20below.) to cancel.
-
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const { context, GitHub } = require('@actions/github');
+            
+            const title = 'User input required';
+            const body = `
+              Please click [Continue](../../issues/new?title=Continue%20Workflow&body=Please%20continue%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"continue"%20below.) to proceed or [Cancel](../../issues/new?title=Cancel%20Workflow&body=Please%20cancel%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"cancel"%20below.) to cancel.
+            `;
+            
+            const octokit = new GitHub(process.env.GITHUB_TOKEN);
+            await octokit.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body
+            });
+            
   continue_or_cancel:
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request != null && github.event.issue.comments != null
