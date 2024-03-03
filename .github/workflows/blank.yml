@@ -18,6 +18,9 @@ jobs:
       - name: Install dependencies
         run: pip install pandas requests
 
+      - name: Install npm dependencies
+        run: npm install @actions/github
+
       - name: Run Python script
         run: python validate.py
         id: python-script
