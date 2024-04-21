@@ -1,60 +1,19 @@
-name: Workflow with Interactive Steps
+name: API Automation
 
 on:
   push:
     branches:
       - main
-  issue_comment:
-    types: [created]
 
 jobs:
-  run_python_script:
+  process_data:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: pip install pandas requests
-
-      - name: Run Python script
-        run: python validate.py
-        id: python-script
-
-      - name: Install GitHub Script Dependencies
-        run: npm install @actions/github
-
-      - name: Create Issue
-        if: always()
-        uses: actions/github-script@v4
-        with:
-          github-token: "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"
-          script: |
-            const title = 'User input required';
-            const body = `
-              Please click [Continue](../../issues/new?title=Continue%20Workflow&body=Please%20continue%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"continue"%20below.) to proceed or [Cancel](../../issues/new?title=Cancel%20Workflow&body=Please%20cancel%20the%20workflow.%20You%20can%20do%20this%20by%20commenting%20"cancel"%20below.) to cancel.
-            `;
-            
-            await github.issues.create({
-              owner: 'likhithnemani', // Replace 'YourRepoOwner' with your repository owner
-              repo: 'automatic-folder',   // Replace 'YourRepoName' with your repository name
-              title: title,
-              body: body
-            });
-
-  continue_or_cancel:
-    runs-on: ubuntu-latest
-    if: github.event.issue.pull_request != null && github.event.issue.comments != null
-    steps:
-      - name: Check for 'Continue' or 'Cancel' comment
+      - name: Read data from file
         run: |
-          if grep -qE '(^|\W)continue(\W|$)' <<< "${{ github.event.comment.body }}"; then
-            echo "User clicked Continue."
-            # Continue with workflow steps
-          elif grep -qE '(^|\W)cancel(\W|$)' <<< "${{ github.event.comment.body }}"; then
-            echo "User clicked Cancel."
-            # Stop the workflow or take appropriate action
-          else
-            echo "Invalid comment. Please comment 'continue' or 'cancel'."
-          fi
+          data=$(cat README.md)
+          echo "Data from file: $data"
