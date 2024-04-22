@@ -23,8 +23,20 @@ jobs:
         run: |
           echo "api_response='<answer> package.json, README.md, .gitignore, yarn.lock, babel.config.js, src/index.js, src/server.js, src/routes.js, src/app.js, src/weather.js, .eslintrc.json, .gitattributes, .editorconfig, test/test-helper.js, test/weather.test.js, public/index.html, public/favicon.ico, public/index.css, public/assets/css/weather.css, public/assets/css/bootstrap.css, public/assets/img/rainy.png, public/assets/img/cloud.png, public/assets/img/sunny.png, public/assets/img/windy.png</answer>'" >> $GITHUB_ENV
 
-      - name: Extract info from API response
+      - name: Create Files
         run: |
-          # response=$(echo "${{ steps.api_call.outputs.api_response }}")
-          answer=$(echo "$api_response" | sed -n 's/.*<answer>\(.*\)<\/answer>.*/\1/p')
-          echo "Extracted Info: $answer"
+          # Extract file names from api_response
+          files=$(echo "$api_response" | sed -n 's/.*<answer>\(.*\)<\/answer>.*/\1/p')
+          
+          # Loop through each file name and create files
+          for file in $files; do
+            echo "Creating file: $file"
+            echo "Content for $file" > "$file"
+          done
+
+      - name: Commit and push changes
+        uses: actions/commit@v2
+        with:
+          commit-message: "Add files based on API response"
+          files: |
+            $files
