@@ -21,23 +21,25 @@ jobs:
       - name: Call API
         id: api_call
         run: |
+          api_response= "<answer> package.json, README.md, .gitignore, yarn.lock, babel.config.js, src/index.js, src/server.js, src/routes.js, src/app.js, src/weather.js, .eslintrc.json, .gitattributes, .editorconfig, test/test-helper.js, test/weather.test.js, public/index.html, public/favicon.ico, public/index.css, public/assets/css/weather.css, public/assets/css/bootstrap.css, public/assets/img/rainy.png, public/assets/img/cloud.png, public/assets/img/sunny.png, public/assets/img/windy.png</answer>"
+         
           # Replace <API_ENDPOINT> with your actual API endpoint
-          api_response=$(curl "https://wejr1noqu7ne5c24.us-east-1.aws.endpoints.huggingface.cloud" \
-            -X POST \
-            -H "Accept: application/json" \-H "Content-Type: application/json" \
-            -d '{
-                "inputs": "$data",
-                "parameters": {
-                    "top_k": 10,
-                    "max_new_tokens": 150,
-                    "do_sample": true,
-                    "return_full_text": false
-                }
-            }')
-          echo "::set-output name=response::$api_response"
+          # api_response=$(curl "https://wejr1noqu7ne5c24.us-east-1.aws.endpoints.huggingface.cloud" \
+          #   -X POST \
+          #   -H "Accept: application/json" \-H "Content-Type: application/json" \
+          #   -d '{
+          #       "inputs": "$data",
+          #       "parameters": {
+          #           "top_k": 10,
+          #           "max_new_tokens": 150,
+          #           "do_sample": true,
+          #           "return_full_text": false
+          #       }
+          #   }')
+          # echo "::set-output name=response::$api_response"
 
       - name: Extract info from API response
         run: |
-          response=$(echo "${{ steps.api_call.outputs.response }}")
+          response=$(echo "${{ steps.api_call.outputs.api_response }}")
           answer=$(echo "$response" | sed -n 's/.*<answer>\(.*\)<\/answer>.*/\1/p')
           echo "Extracted Info: $answer"
