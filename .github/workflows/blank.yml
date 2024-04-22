@@ -30,6 +30,13 @@ jobs:
           
           # Loop through each file name and create files
           for file in $files; do
+            # Check if the file name includes directories
+            if [[ $file == *"/"* ]]; then
+              # Extract directory name
+              dir=$(dirname "$file")
+              # Create directory if it doesn't exist
+              mkdir -p "$dir"
+            fi
             echo "Creating file: $file"
             echo "Content for $file" > "$file"
           done
