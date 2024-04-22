@@ -17,3 +17,27 @@ jobs:
         run: |
           data=$(cat README.md)
           echo "Data from file: $data"
+
+      - name: Call API
+        id: api_call
+        run: |
+          # Replace <API_ENDPOINT> with your actual API endpoint
+          api_response=$(curl "https://wejr1noqu7ne5c24.us-east-1.aws.endpoints.huggingface.cloud" \
+            -X POST \
+            -H "Accept: application/json" \-H "Content-Type: application/json" \
+            -d '{
+                "inputs": "$data",
+                "parameters": {
+                    "top_k": 10,
+                    "max_new_tokens": 150,
+                    "do_sample": true,
+                    "return_full_text": false
+                }
+            }')
+          echo "::set-output name=response::$api_response"
+
+      - name: Extract info from API response
+        run: |
+          response=$(echo "${{ steps.api_call.outputs.response }}")
+          answer=$(echo "$response" | sed -n 's/.*<answer>\(.*\)<\/answer>.*/\1/p')
+          echo "Extracted Info: $answer"
