@@ -47,4 +47,5 @@ jobs:
           git config --global user.name "GitHub Actions"
           git add .
           git commit -m "Add files based on API response"
-          git push
+          # Use the PAT for authentication
+          git push https://github.com/${{ github.repository }}.git HEAD:main
