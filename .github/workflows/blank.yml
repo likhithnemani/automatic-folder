@@ -41,7 +41,5 @@ jobs:
           git add .
           git commit -m "Initial commit"
           git branch -M main
-          # Replace <REPO_NAME> with your new repository name
-          # Replace <YOUR_USERNAME> with your GitHub username
-          git remote add origin https://github.com/likhithnemani/sample.git
-          git push -u origin main
+          git remote -v
+          git push origin main
