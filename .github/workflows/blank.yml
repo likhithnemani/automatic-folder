@@ -4,22 +4,16 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      name:
-        description: 'Enter your name'
-        required: true
-      age:
-        description: 'Enter your age'
-        required: true
 
 jobs:
   greet:
     runs-on: ubuntu-latest
     steps:
-      - name: Greet user
+      - name: Prompt user for input
         run: |
-          echo "Hello ${{ inputs.name }}, you are ${{ inputs.age }} years old!"
+          echo "::workflow-command::{\"command\":\"user-input\",\"inputs\":[{\"id\":\"name\",\"description\":\"Enter your name\"}]}"
+          USER_INPUT=${{ env.user_input_name }}
+          echo "Hello $USER_INPUT!"
           
   process_data:
     runs-on: ubuntu-latest
