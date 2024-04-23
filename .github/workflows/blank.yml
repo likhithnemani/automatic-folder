@@ -4,8 +4,23 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Enter your name'
+        required: true
+      age:
+        description: 'Enter your age'
+        required: true
 
 jobs:
+  greet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greet user
+        run: |
+          echo "Hello ${{ inputs.name }}, you are ${{ inputs.age }} years old!"
+          
   process_data:
     runs-on: ubuntu-latest
 
