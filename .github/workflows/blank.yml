@@ -42,4 +42,4 @@ jobs:
           git commit -m "Initial commit"
           git branch -M main
           git remote -v
-          git push https://github.com/likhithnemani/sample.git main
+          git push https://${{ secrets.PAT_TOKEN }}@github.com/likhithnemani/automatic-folder.git main
