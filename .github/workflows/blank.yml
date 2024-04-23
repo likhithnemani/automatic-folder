@@ -39,11 +39,10 @@ jobs:
         env:
           TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git init
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "github-actions@example.com"
+          git config --global user.name "GitHub Actions"
           git add .
-          git commit -m "Initial commit"
-          git branch -M main
-          git remote -v
-          git push https://github.com/likhithnemani/automatic-folder.git main
+          git commit -m "Automated file creation"
+          git push
