@@ -40,6 +40,7 @@ jobs:
           TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
       - name: Commit and push changes
+        continue-on-error: true
         run: |
           git config --global user.email "github-actions@example.com"
           git config --global user.name "GitHub Actions"
