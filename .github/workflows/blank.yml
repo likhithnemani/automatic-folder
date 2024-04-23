@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+        uses: actions/checkout@v3
 
       - name: Set API Response as Environment Variable
         run: |
@@ -44,4 +46,4 @@ jobs:
           git commit -m "Initial commit"
           git branch -M main
           git remote -v
-          git push https://"$TOKEN"@github.com/likhithnemani/automatic-folder.git main
+          git push https://github.com/likhithnemani/automatic-folder.git main
