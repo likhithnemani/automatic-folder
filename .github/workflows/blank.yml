@@ -34,6 +34,8 @@ jobs:
           done
 
       - name: Initialize Git and add files
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git init
           git config user.email "actions@github.com"
@@ -42,4 +44,4 @@ jobs:
           git commit -m "Initial commit"
           git branch -M main
           git remote -v
-          git push https://${{ secrets.PAT_TOKEN }}@github.com/likhithnemani/automatic-folder.git main
+          git push https://"$TOKEN"@github.com/likhithnemani/automatic-folder.git main
