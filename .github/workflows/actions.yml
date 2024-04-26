@@ -8,7 +8,7 @@ on:
 jobs:
 
   automate:
-    if: github.actor != 'GitHub Actions'
+    if: github.event_name == 'push' && github.event.sender.login == 'likhithnemani'
     runs-on: ubuntu-latest
 
     steps:
