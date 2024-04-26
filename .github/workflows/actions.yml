@@ -39,7 +39,7 @@ jobs:
                 "return_full_text": false
               }
             }')
-            echo "api_response=$api_response" >> $GITHUB_OUTPUT
+            echo "api_response=$api_response[0]['generated_text']" >> $GITHUB_OUTPUT
             echo "$api_response"
 
           
