@@ -42,7 +42,8 @@ jobs:
           python-version: '3.x'
       - name: Create files
         run: |
-          files=$(echo "${{ steps.get_api_response.outputs.api_response }}" | tr ',' '\n')
+          raw_files=$(echo "${{ steps.get_api_response.outputs.api_response }}")
+          files=$(echo "$raw_files" | sed -n 's/.*<answer>\(.*\)\(<\/answer>\)\?/\1/p' | tr ',' '\n')
           total_files=$(echo "$files" | wc -l)
           counter=1
       
