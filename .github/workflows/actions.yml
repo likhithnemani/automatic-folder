@@ -55,16 +55,15 @@ jobs:
               fi
             fi
       
-            if [[ $file == _"/"_ ]]; then
-              dir=$(dirname "$file")
-              mkdir -p "$dir"
-            fi
-
             if [[ $file == .vscode* || $file == .git* ]]; then
               echo "Ignoring $file"
               continue
             fi
-
+      
+            dir=$(dirname "$file")
+            if [ "$dir" != "." ]; then
+              mkdir -p "$dir"
+            fi
       
             echo "Creating file: $file"
             echo "Content for $file" > "$file"
