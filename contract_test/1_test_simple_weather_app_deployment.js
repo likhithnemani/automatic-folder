@@ -1,1 +1,0 @@
-Content for contract_test/1_test_simple_weather_app_deployment.js
