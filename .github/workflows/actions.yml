@@ -8,8 +8,8 @@ on:
 jobs:
 
   automate:
-    if: github.actor == 'likhithnemani'
     runs-on: ubuntu-latest
+    if: github.actor == 'likhithnemani'
 
     steps:
       - name: Checkout code
