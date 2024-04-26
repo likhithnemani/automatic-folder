@@ -36,18 +36,19 @@ jobs:
           echo "api_response=$(echo "$api_response" | jq '.[]?.generated_text')" >> $GITHUB_OUTPUT
 
           
-      - name: Create and Push Files
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
       - name: Create files
         run: |
           raw_files=$(echo "${{ steps.get_api_response.outputs.api_response }}")
-          files=$(echo "$raw_files" | sed -n 's/.*<answer>\(.*\)\(<\/answer>\)\?/\1/p' | tr ',' '\n')
-          total_files=$(echo "$files" | wc -l)
+          if [[ $raw_files == *"</answer>"* ]]; then
+            end_index=$((${#raw_files} - ${#${raw_files#*</answer>}} - 9))
+            files=${raw_files:0:$end_index}
+          else
+            files=$raw_files
+          fi
+          total_files=$(echo "$files" | tr ',' '\n' | wc -l)
           counter=1
       
-          for file in $files; do
+          for file in $(echo "$files" | tr ',' '\n'); do
             if [ $counter -eq $total_files ]; then
               if [[ $file != *"."* ]]; then
                 echo "Ignoring incomplete file name: $file"
