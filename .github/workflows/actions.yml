@@ -81,6 +81,7 @@ jobs:
       - name: Commit and push changes
         continue-on-error: true
         run: |
+          git checkout -b dev
           git config --global user.email "github-actions@example.com"
           git config --global user.name "GitHub Actions"
           git add .
