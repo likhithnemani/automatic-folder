@@ -61,11 +61,11 @@ jobs:
       
             dir=$(dirname "$file")
             if [ "$dir" != "." ]; then
-              mkdir -p "$dir"
+              mkdir -p "$dir" || continue
             fi
       
             echo "Creating file: $file"
-            echo "Content for $file" > "$file"
+            echo "Content for $file" > "$file" || continue
       
             counter=$((counter+1))
           done
