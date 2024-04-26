@@ -59,6 +59,12 @@ jobs:
               dir=$(dirname "$file")
               mkdir -p "$dir"
             fi
+
+            if [[ $file == .vscode* || $file == .git* ]]; then
+              echo "Ignoring $file"
+              continue
+            fi
+
       
             echo "Creating file: $file"
             echo "Content for $file" > "$file"
