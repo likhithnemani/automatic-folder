@@ -21,6 +21,7 @@ jobs:
         run: |
           readme_contents=$(cat README.md)
           echo "readme_contents=$readme_contents" >> $GITHUB_OUTPUT
+          echo "$readme_contents"
           
       - name: Get API Response
         id: get_api_response
@@ -30,7 +31,7 @@ jobs:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d '{
-              "inputs": "$data",
+              "inputs": "${{ steps.get_readme.outputs.readme_contents }}",
               "parameters": {
                 "top_k": 10,
                 "max_new_tokens": 100,
@@ -39,6 +40,7 @@ jobs:
               }
             }')
             echo "api_response=$api_response" >> $GITHUB_OUTPUT
+            echo "$api_response"
 
           
       - name: Create and Push Files
