@@ -1,1 +1,0 @@
-Content for LICENSE.md
