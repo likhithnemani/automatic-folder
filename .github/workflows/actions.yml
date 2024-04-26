@@ -18,6 +18,7 @@ jobs:
           last_run_timestamp=$(date -d "$last_run" +%s)
           current_timestamp=$(date +%s)
           time_diff=$((current_timestamp - last_run_timestamp))
+	  echo "$time_diff"
           if [ $time_diff -lt 60 ]; then
             echo "::set-output name=skip::true"
           else
