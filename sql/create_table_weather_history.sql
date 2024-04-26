@@ -1,0 +1,1 @@
+Content for sql/create_table_weather_history.sql
