@@ -33,8 +33,7 @@ jobs:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "$(jq -n --arg inputs "${{ steps.get_readme.outputs.readme_contents }}" '{inputs: $inputs, parameters: {top_k: 10, max_new_tokens: 200, do_sample: true, return_full_text: false}}')")
-            echo "api_response=$(api_response[0]['generated_text'])" >> $GITHUB_OUTPUT
-            echo "$api_response"
+          echo "api_response=$(echo "$api_response" | jq '.[]?.generated_text')" >> $GITHUB_OUTPUT
 
           
       - name: Create and Push Files
