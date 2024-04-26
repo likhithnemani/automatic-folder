@@ -19,9 +19,11 @@ jobs:
       - name: Get README.md Contents
         id: get_readme
         run: |
-          readme_contents=$(cat README.md)
+          readme_contents=$(cat << 'EOF'
+          $(cat README.md)
+          EOF
+          )
           echo "readme_contents=$readme_contents" >> $GITHUB_OUTPUT
-          echo "$readme_contents"
           
       - name: Get API Response
         id: get_api_response
