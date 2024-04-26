@@ -8,16 +8,30 @@ on:
 jobs:
 
   automate:
-    if: github.event_name == 'push' && github.event.sender.login == 'likhithnemani'
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check last workflow run
+        id: check_last_run
+        run: |
+          last_run=$(curl -s -X GET -u "username:${{ secrets.PAT_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=1" | jq -r '.workflow_runs[0].created_at')
+          last_run_timestamp=$(date -d "$last_run" +%s)
+          current_timestamp=$(date +%s)
+          time_diff=$((current_timestamp - last_run_timestamp))
+          if [ $time_diff -lt 120 ]; then
+            echo "::set-output name=skip::true"
+          else
+            echo "::set-output name=skip::false"
+          fi
+          
       - name: Checkout code
+        if: steps.check_last_run.outputs.skip != 'true'
         with:
           token: ${{ secrets.PAT_TOKEN }}
         uses: actions/checkout@v3
 
       - name: Get README.md Contents
+        if: steps.check_last_run.outputs.skip != 'true'
         id: get_readme
         run: |
           echo "${{ github.actor }}"
@@ -28,6 +42,7 @@ jobs:
           echo "readme_contents=$readme_contents" >> $GITHUB_OUTPUT
           
       - name: Get API Response
+        if: steps.check_last_run.outputs.skip != 'true'
         id: get_api_response
         run: |
           api_response=$(curl "https://ssyptd4iv1v0gja5.us-east-1.aws.endpoints.huggingface.cloud" \
@@ -39,6 +54,7 @@ jobs:
 
           
       - name: Create files
+        if: steps.check_last_run.outputs.skip != 'true'
         run: |
           raw_files=$(echo "${{ steps.get_api_response.outputs.api_response }}")
           if [[ $raw_files == *"</answer>"* ]]; then
@@ -80,6 +96,7 @@ jobs:
           TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
       - name: Commit and push changes
+        if: steps.check_last_run.outputs.skip != 'true'
         continue-on-error: true
         run: |
           git config --global user.email "github-actions@example.com"
