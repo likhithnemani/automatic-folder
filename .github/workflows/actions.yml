@@ -8,7 +8,7 @@ on:
 jobs:
 
   automate:
-    if: github.actor == 'likhithnemani' && github.event_name == 'push' && !startsWith(github.actor, 'github-actions[')
+    if: github.actor != 'GitHub Actions'
     runs-on: ubuntu-latest
 
     steps:
