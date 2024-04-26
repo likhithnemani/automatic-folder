@@ -11,21 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check last workflow run
-        id: check_last_run
-        run: |
-          last_run=$(curl -s -X GET -u "username:${{ secrets.PAT_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/runs?per_page=1" | jq -r '.workflow_runs[0]')
-          last_run_end_time=$(echo "$last_run" | jq -r '.completed_at')
-          last_run_timestamp=$(date -d "$last_run_end_time" +%s)
-          current_timestamp=$(date +%s)
-          time_diff=$((current_timestamp - last_run_timestamp))
-          echo "Time difference: $time_diff seconds"
-          if [ $time_diff -gt 60 ]; then
-            echo "::set-output name=skip::false"
-          else
-            echo "::set-output name=skip::true"
-          fi
-          
       - name: Checkout code
         if: steps.check_last_run.outputs.skip != 'true'
         with:
