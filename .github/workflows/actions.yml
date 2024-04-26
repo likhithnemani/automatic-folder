@@ -6,15 +6,7 @@ on:
       - main
 
 jobs:
-  greet:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Prompt user for input
-        run: |
-          echo "::workflow-command::{\"command\":\"user-input\",\"inputs\":[{\"id\":\"name\",\"description\":\"Enter your name\"}]}"
-          USER_INPUT=${{ env.user_input_name }}
-          echo "Hello $USER_INPUT!"
-          
+
   process_data:
     runs-on: ubuntu-latest
 
@@ -24,25 +16,60 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
         uses: actions/checkout@v3
 
-      - name: Set API Response as Environment Variable
+      - name: Get README.md Contents
+        id: get_readme
         run: |
-          echo "api_response='<answer> package.json, README.md, .gitignore, yarn.lock, babel.config.js, src/index.js, src/server.js, src/routes.js, src/app.js, src/weather.js, .eslintrc.json, .gitattributes, .editorconfig, test/test-helper.js, test/weather.test.js, public/index.html, public/favicon.ico, public/index.css, public/assets/css/weather.css, public/assets/css/bootstrap.css, public/assets/img/rainy.png, public/assets/img/cloud.png, public/assets/img/sunny.png, public/assets/img/windy.png</answer>'" >> $GITHUB_ENV
+          readme_contents=$(cat README.md)
+          echo "readme_contents=$readme_contents" >> $GITHUB_OUTPUT
+          
+      - name: Get API Response
+        id: get_api_response
+        run: |
+          api_response=$(curl "https://ssyptd4iv1v0gja5.us-east-1.aws.endpoints.huggingface.cloud" \
+            -X POST \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "inputs": "$data",
+              "parameters": {
+                "top_k": 10,
+                "max_new_tokens": 100,
+                "do_sample": true,
+                "return_full_text": false
+              }
+            }')
+            echo "api_response=$api_response" >> $GITHUB_OUTPUT
 
+          
       - name: Create and Push Files
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
       - name: Create files
         run: |
-          files=$(echo "$api_response" | sed -n 's/.*<answer>\(.*\)<\/answer>.*/\1/p' | tr -d ' ' | tr ',' '\n')
+          files=$(echo "${{ steps.get_api_response.outputs.api_response }}" | tr ',' '\n')
+          total_files=$(echo "$files" | wc -l)
+          counter=1
+      
           for file in $files; do
-            if [[ $file == *"/"* ]]; then
+            if [ $counter -eq $total_files ]; then
+              if [[ $file != *"."* ]]; then
+                echo "Ignoring incomplete file name: $file"
+                continue
+              fi
+            fi
+      
+            if [[ $file == _"/"_ ]]; then
               dir=$(dirname "$file")
               mkdir -p "$dir"
             fi
+      
             echo "Creating file: $file"
             echo "Content for $file" > "$file"
+      
+            counter=$((counter+1))
           done
+
 
       - name: Initialize Git and add files
         env:
