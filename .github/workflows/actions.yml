@@ -22,6 +22,7 @@ jobs:
         id: get_readme
         run: |
           git checkout -b dev
+          git pull
           echo "${{ github.actor }}"
           readme_contents=$(cat << 'EOF'
           $(cat README.md)
