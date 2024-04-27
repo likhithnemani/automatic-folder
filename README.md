@@ -2,4 +2,4 @@
 Upon opening the application, users are greeted with a simple interface where they can input their location. The application then fetches weather data corresponding to the provided location and displays it in a visually appealing manner. The weather information may include temperature, humidity, wind speed, and weather conditions, accompanied by relevant icons.
 The frontend components are styled using CSS to ensure a consistent and visually pleasing user experience across different devices. Additionally, error handling and loading states are implemented to enhance the robustness of the application.
 By combining the power of Node.js for backend logic and React for frontend interactivity, this weather application offers a seamless and efficient way for users to access up-to-date weather forecasts
- ### File Names:[/INST] <answer>
+### File Names:[/INST] <answer>
