@@ -22,8 +22,6 @@ jobs:
         id: get_readme
         run: |
           git checkout -b dev
-          git config pull.rebase true
-          git pull origin dev
           echo "${{ github.actor }}"
           readme_contents=$(cat << 'EOF'
           $(cat README.md)
