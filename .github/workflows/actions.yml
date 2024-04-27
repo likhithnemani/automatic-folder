@@ -21,6 +21,7 @@ jobs:
         if: steps.check_last_run.outputs.skip != 'true'
         id: get_readme
         run: |
+          git checkout -b dev
           echo "${{ github.actor }}"
           readme_contents=$(cat << 'EOF'
           $(cat README.md)
