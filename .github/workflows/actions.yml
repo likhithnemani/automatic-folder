@@ -21,15 +21,15 @@ jobs:
         if: steps.check_last_run.outputs.skip != 'true'
         id: get_readme
         run: |
-          git checkout -b dev
+	  git checkout -b dev
 	  git config pull.rebase true
 	  git pull origin dev
-          echo "${{ github.actor }}"
-          readme_contents=$(cat << 'EOF'
-          $(cat README.md)
-          EOF
-          )
-          echo "readme_contents=$readme_contents" >> $GITHUB_OUTPUT
+	  echo "${{ github.actor }}"
+	  readme_contents=$(cat << 'EOF'
+	  $(cat README.md)
+	  EOF
+	  )
+	  echo "readme_contents=$readme_contents" >> $GITHUB_OUTPUT
           
       - name: Get API Response
         if: steps.check_last_run.outputs.skip != 'true'
