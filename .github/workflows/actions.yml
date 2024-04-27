@@ -91,4 +91,4 @@ jobs:
           git config --global user.name "GitHub Actions"
           git add .
           git commit -m "Automated file creation"
-          git push
+          git push.autoSetupRemote
